@@ -11,7 +11,8 @@ let currentTimeDisplay, totalDurationDisplay;
 let miniPlayerDiv;
 let miniPlayerTitle;
 let miniPlayerPlayPauseBtn, miniPlayerPlayPauseIcon;
-let miniPlayerRewindBtn, miniPlayerForwardBtn;
+let miniPlayerRewindBtn, miniPlayerForwardBtn; // Ensured these are declared
+let miniPlayerThumbnail; // For the thumbnail image
 let miniPlayerCurrentTime, miniPlayerTotalDuration;
 let miniPlayerProgressBarContainer, miniPlayerProgressFill;
 let miniPlayerCloseBtn;
@@ -58,8 +59,9 @@ function initializePlayerDOMReferences() {
     miniPlayerTitle = document.getElementById('mini-player-title');
     miniPlayerPlayPauseBtn = document.getElementById('mini-player-play-pause-btn');
     miniPlayerPlayPauseIcon = document.getElementById('mini-player-play-pause-icon');
-    miniPlayerRewindBtn = document.getElementById('mini-player-rewind-btn');
-    miniPlayerForwardBtn = document.getElementById('mini-player-forward-btn');
+    miniPlayerRewindBtn = document.getElementById('mini-player-rewind-btn'); // Ensured ref
+    miniPlayerForwardBtn = document.getElementById('mini-player-forward-btn'); // Ensured ref
+    miniPlayerThumbnail = document.getElementById('mini-player-thumbnail'); // Added ref
     miniPlayerCurrentTime = document.getElementById('mini-player-current-time');
     miniPlayerTotalDuration = document.getElementById('mini-player-total-duration');
     miniPlayerProgressBarContainer = document.getElementById('mini-player-progress-bar-container');
@@ -71,19 +73,23 @@ function initializePlayerDOMReferences() {
     headerPlayerProgressFill = document.getElementById('header-player-progress-fill');
     headerPlayerProgressContainer = document.getElementById('header-player-progress-container');
 
+    // Warnings for missing elements
     if (!globalAudioPlayer) console.warn("Global audio player element not found.");
-    if (!playPauseBtn && document.getElementById('play-pause-btn')) console.warn("Main play/pause button not found by populateFeaturedEpisode, but exists."); // Check if it's a timing issue with router
+    if (!playPauseBtn && document.getElementById('play-pause-btn')) console.warn("Main play/pause button (featured) not found by JS, but exists in HTML."); // Check if it's a timing issue with router
     if (!miniPlayerDiv) console.warn("Mini-player container not found.");
     if (!headerPlayerPlayPauseButton) console.warn("Header player play/pause button not found.");
+    if (!miniPlayerThumbnail) console.warn("Mini-player thumbnail element not found.");
 
+
+    // Event Listeners
     if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlayPause);
     if (rewindBtn) rewindBtn.addEventListener('click', () => skipTime(-5));
     if (forwardBtn) forwardBtn.addEventListener('click', () => skipTime(5));
     if (progressBarContainer) progressBarContainer.addEventListener('click', handleProgressBarSeek);
 
     if (miniPlayerPlayPauseBtn) miniPlayerPlayPauseBtn.addEventListener('click', togglePlayPause);
-    if (miniPlayerRewindBtn) miniPlayerRewindBtn.addEventListener('click', () => skipTime(-5));
-    if (miniPlayerForwardBtn) miniPlayerForwardBtn.addEventListener('click', () => skipTime(5));
+    if (miniPlayerRewindBtn) miniPlayerRewindBtn.addEventListener('click', () => skipTime(-5)); // Ensured listener
+    if (miniPlayerForwardBtn) miniPlayerForwardBtn.addEventListener('click', () => skipTime(5)); // Ensured listener
     if (miniPlayerProgressBarContainer) miniPlayerProgressBarContainer.addEventListener('click', handleProgressBarSeek);
     if (miniPlayerCloseBtn) {
         miniPlayerCloseBtn.addEventListener('click', () => {
@@ -95,12 +101,8 @@ function initializePlayerDOMReferences() {
         });
     }
 
-    if (headerPlayerPlayPauseButton) {
-        headerPlayerPlayPauseButton.addEventListener('click', togglePlayPause);
-    }
-    if (headerPlayerProgressContainer) {
-        headerPlayerProgressContainer.addEventListener('click', handleProgressBarSeek);
-    }
+    if (headerPlayerPlayPauseButton) headerPlayerPlayPauseButton.addEventListener('click', togglePlayPause);
+    if (headerPlayerProgressContainer) headerPlayerProgressContainer.addEventListener('click', handleProgressBarSeek);
 
     if (globalAudioPlayer) {
         globalAudioPlayer.addEventListener('play', handleAudioPlay);
@@ -112,85 +114,55 @@ function initializePlayerDOMReferences() {
     }
 }
 
-function togglePlayPause() {
-    if (!globalAudioPlayer || !globalAudioPlayer.src) {
-        console.warn("No audio source loaded.");
-        return;
-    }
+function togglePlayPause() { /* ... (same as before) ... */
+    if (!globalAudioPlayer || !globalAudioPlayer.src) { console.warn("No audio source loaded."); return; }
     if (globalAudioPlayer.paused || globalAudioPlayer.ended) {
-        globalAudioPlayer.play().catch(err => {
-            console.error("Error playing audio:", err);
-            displayErrorMessage(`Error playing audio: ${err.message}`);
-            updatePlayPauseIcon();
-        });
-    } else {
-        globalAudioPlayer.pause();
-    }
+        globalAudioPlayer.play().catch(err => { console.error("Error playing audio:", err); displayErrorMessage(`Error playing audio: ${err.message}`); updatePlayPauseIcon(); });
+    } else { globalAudioPlayer.pause(); }
 }
-
-function skipTime(seconds) {
-    if (!globalAudioPlayer || !globalAudioPlayer.duration || isNaN(globalAudioPlayer.duration)) {
-        console.warn("Cannot skip: Audio not loaded or duration unknown.");
-        return;
-    }
+function skipTime(seconds) { /* ... (same as before) ... */
+    if (!globalAudioPlayer || !globalAudioPlayer.duration || isNaN(globalAudioPlayer.duration)) { console.warn("Cannot skip: Audio not loaded or duration unknown."); return; }
     const newTime = globalAudioPlayer.currentTime + seconds;
     globalAudioPlayer.currentTime = Math.max(0, Math.min(newTime, globalAudioPlayer.duration));
 }
-
-function updatePlayPauseIcon() {
+function updatePlayPauseIcon() { /* ... (same as before, updates all 3 icons) ... */
     const isPaused = globalAudioPlayer && (globalAudioPlayer.paused || globalAudioPlayer.ended);
     const iconText = isPaused ? 'play_arrow' : 'pause';
     if (playPauseIcon) playPauseIcon.textContent = iconText;
     if (miniPlayerPlayPauseIcon) miniPlayerPlayPauseIcon.textContent = iconText;
     if (headerPlayerPlayPauseIcon) headerPlayerPlayPauseIcon.textContent = iconText;
 }
-
-function handleAudioPlay() {
+function handleAudioPlay() { /* ... (same as before) ... */
     updatePlayPauseIcon();
-    if (miniPlayerDiv) {
-        miniPlayerDiv.classList.remove('hidden', 'opacity-0');
-        miniPlayerDiv.classList.add('visible');
-        console.log('Audio playing, mini-player shown.');
-    }
+    if (miniPlayerDiv) { miniPlayerDiv.classList.remove('hidden', 'opacity-0'); miniPlayerDiv.classList.add('visible'); console.log('Audio playing, mini-player shown.'); }
 }
-
-function updateDurationDisplay() {
+function updateDurationDisplay() { /* ... (same as before, updates 2 duration displays) ... */
     const durationText = (globalAudioPlayer && !isNaN(globalAudioPlayer.duration)) ? formatDuration(globalAudioPlayer.duration) : '00:00';
     if (totalDurationDisplay) totalDurationDisplay.textContent = durationText;
     if (miniPlayerTotalDuration) miniPlayerTotalDuration.textContent = durationText;
 }
-
-function updateTimeAndProgress() {
+function updateTimeAndProgress() { /* ... (same as before, updates all 3 progress bars & 2 time displays) ... */
     const currentTimeText = (globalAudioPlayer && !isNaN(globalAudioPlayer.currentTime)) ? formatDuration(globalAudioPlayer.currentTime) : '00:00';
     let progressPercent = 0;
-
     if (globalAudioPlayer && globalAudioPlayer.duration && !isNaN(globalAudioPlayer.duration) && globalAudioPlayer.duration > 0) {
         progressPercent = (globalAudioPlayer.currentTime / globalAudioPlayer.duration) * 100;
     }
-
     if (currentTimeDisplay) currentTimeDisplay.textContent = currentTimeText;
     if (progressBarFill) progressBarFill.style.width = `${progressPercent}%`;
-
     if (miniPlayerCurrentTime) miniPlayerCurrentTime.textContent = currentTimeText;
     if (miniPlayerProgressFill) miniPlayerProgressFill.style.width = `${progressPercent}%`;
-
     if (headerPlayerProgressFill) headerPlayerProgressFill.style.width = `${progressPercent}%`;
 }
-
-function handleAudioEnded() {
-    console.log("Audio playback ended.");
-    updatePlayPauseIcon();
+function handleAudioEnded() { /* ... (same as before, resets all 3 progress bars & 2 time displays) ... */
+    console.log("Audio playback ended."); updatePlayPauseIcon();
     if (progressBarFill) progressBarFill.style.width = '0%';
     if (miniPlayerProgressFill) miniPlayerProgressFill.style.width = '0%';
     if (headerPlayerProgressFill) headerPlayerProgressFill.style.width = '0%';
-
     if (currentTimeDisplay) currentTimeDisplay.textContent = formatDuration(0);
     if (miniPlayerCurrentTime) miniPlayerCurrentTime.textContent = formatDuration(0);
 }
-
-function handleAudioError(event) {
-    console.error("Audio player error:", event);
-    let errorMessage = "An error occurred with the audio player.";
+function handleAudioError(event) { /* ... (same as before, resets all players' UI) ... */
+    console.error("Audio player error:", event); let errorMessage = "An error occurred with the audio player.";
     if (globalAudioPlayer.error) {
         switch (globalAudioPlayer.error.code) {
             case MediaError.MEDIA_ERR_ABORTED: errorMessage = "Audio playback was aborted."; break;
@@ -200,24 +172,13 @@ function handleAudioError(event) {
             default: errorMessage = "An unknown error occurred.";
         }
     }
-    displayErrorMessage(errorMessage);
-    updatePlayPauseIcon();
-    if (progressBarFill) progressBarFill.style.width = '0%';
-    if (miniPlayerProgressFill) miniPlayerProgressFill.style.width = '0%';
-    if (headerPlayerProgressFill) headerPlayerProgressFill.style.width = '0%';
-
-    if (currentTimeDisplay) currentTimeDisplay.textContent = '00:00';
-    if (miniPlayerCurrentTime) miniPlayerCurrentTime.textContent = '00:00';
-
-    if (totalDurationDisplay) totalDurationDisplay.textContent = '00:00';
-    if (miniPlayerTotalDuration) miniPlayerTotalDuration.textContent = '00:00';
+    displayErrorMessage(errorMessage); updatePlayPauseIcon();
+    if (progressBarFill) progressBarFill.style.width = '0%'; if (miniPlayerProgressFill) miniPlayerProgressFill.style.width = '0%'; if (headerPlayerProgressFill) headerPlayerProgressFill.style.width = '0%';
+    if (currentTimeDisplay) currentTimeDisplay.textContent = '00:00'; if (miniPlayerCurrentTime) miniPlayerCurrentTime.textContent = '00:00';
+    if (totalDurationDisplay) totalDurationDisplay.textContent = '00:00'; if (miniPlayerTotalDuration) miniPlayerTotalDuration.textContent = '00:00';
 }
-
-function handleProgressBarSeek(event) {
-    if (!globalAudioPlayer || !globalAudioPlayer.duration || isNaN(globalAudioPlayer.duration)) {
-         console.warn("Cannot seek: Audio duration unknown.");
-         return;
-    }
+function handleProgressBarSeek(event) { /* ... (same as before) ... */
+    if (!globalAudioPlayer || !globalAudioPlayer.duration || isNaN(globalAudioPlayer.duration)) { console.warn("Cannot seek: Audio duration unknown."); return; }
     const clickedProgressBarContainer = event.currentTarget;
     const progressBarRect = clickedProgressBarContainer.getBoundingClientRect();
     const clickPositionX = event.clientX - progressBarRect.left;
@@ -226,8 +187,7 @@ function handleProgressBarSeek(event) {
     const seekTime = globalAudioPlayer.duration * seekRatio;
     globalAudioPlayer.currentTime = seekTime;
 }
-
-function showLoadingMessage() {
+function showLoadingMessage() { /* ... (same as before) ... */
     let loadingDiv = document.getElementById('rss-loading-message');
     if (!loadingDiv) {
         loadingDiv = document.createElement('div'); loadingDiv.id = 'rss-loading-message';
@@ -237,17 +197,13 @@ function showLoadingMessage() {
         if (header && header.nextSibling) header.parentNode.insertBefore(loadingDiv, header.nextSibling);
         else document.body.prepend(loadingDiv);
     }
-    loadingDiv.style.display = 'block';
-    const errorDiv = document.getElementById('rss-error-message');
-    if (errorDiv) errorDiv.style.display = 'none';
+    loadingDiv.style.display = 'block'; const errorDiv = document.getElementById('rss-error-message'); if (errorDiv) errorDiv.style.display = 'none';
 }
-function hideLoadingMessage() {
-    const loadingDiv = document.getElementById('rss-loading-message');
-    if (loadingDiv) loadingDiv.style.display = 'none';
+function hideLoadingMessage() { /* ... (same as before) ... */
+    const loadingDiv = document.getElementById('rss-loading-message'); if (loadingDiv) loadingDiv.style.display = 'none';
 }
-function displayErrorMessage(message) {
-    hideLoadingMessage();
-    let errorDiv = document.getElementById('rss-error-message');
+function displayErrorMessage(message) { /* ... (same as before) ... */
+    hideLoadingMessage(); let errorDiv = document.getElementById('rss-error-message');
     if (!errorDiv) {
         errorDiv = document.createElement('div'); errorDiv.id = 'rss-error-message';
         errorDiv.style.color = 'red'; errorDiv.style.backgroundColor = '#ffebee'; errorDiv.style.border = '1px solid red';
@@ -259,26 +215,39 @@ function displayErrorMessage(message) {
     }
     errorDiv.textContent = message; errorDiv.style.display = 'block';
 }
-async function fetchRSSFeed() {
+async function fetchRSSFeed() { /* ... (same as before) ... */
     console.log('Fetching RSS feed...'); showLoadingMessage();
     try {
         const response = await fetch(RSS_URL);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const xmlText = await response.text(); parseRSSFeed(xmlText);
     } catch (error) {
-        console.error('Error fetching RSS feed:', error);
-        displayErrorMessage('Failed to load podcast feed. Please try again later.');
+        console.error('Error fetching RSS feed:', error); displayErrorMessage('Failed to load podcast feed. Please try again later.');
     }
 }
+
+// --- MODIFIED parseRSSFeed ---
 function parseRSSFeed(xmlText) {
-    const parser = new DOMParser(); const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
     const parsingError = xmlDoc.getElementsByTagName('parsererror');
     if (parsingError.length > 0) {
         console.error('Error parsing XML:', parsingError[0].textContent);
         displayErrorMessage('Error processing podcast data. Feed might be malformed.'); return;
     }
+
+    let channelImage = null;
+    const channelImageNode = xmlDoc.querySelector('channel > image > url, channel > itunes\\:image[href]');
+    if (channelImageNode) {
+        channelImage = channelImageNode.textContent || channelImageNode.getAttribute('href');
+    }
+    // console.log('Channel image found:', channelImage); // For debugging
+
     const items = xmlDoc.querySelectorAll('item');
-    if (!items || items.length === 0) { displayErrorMessage('No episodes found in the feed.'); return; }
+    if (!items || items.length === 0) {
+        displayErrorMessage('No episodes found in the feed.'); return;
+    }
+
     const episodes = Array.from(items).map(item => {
         const title = item.querySelector('title')?.textContent || 'No title';
         const link = item.querySelector('link')?.textContent || '#';
@@ -289,60 +258,68 @@ function parseRSSFeed(xmlText) {
         let duration = '0';
         const itunesDurationNode = Array.from(item.childNodes).find(node => node.nodeName === 'itunes:duration' || node.localName === 'duration');
         if (itunesDurationNode) duration = itunesDurationNode.textContent;
-        return { title, link, description, pubDate, audioUrl, duration };
+
+        let imageUrl = null;
+        const itunesImage = item.querySelector('itunes\\:image[href]');
+        if (itunesImage) {
+            imageUrl = itunesImage.getAttribute('href');
+        } else {
+            const mediaThumbnail = item.querySelector('media\\:thumbnail[url]');
+            if (mediaThumbnail) {
+                imageUrl = mediaThumbnail.getAttribute('url');
+            } else {
+                 const imageInDescription = item.querySelector('description img'); // Basic check
+                 if(imageInDescription) imageUrl = imageInDescription.src;
+            }
+        }
+        if (!imageUrl && channelImage) { // Fallback to channel image
+            imageUrl = channelImage;
+        }
+
+        return { title, link, description, pubDate, audioUrl, duration, imageUrl };
     });
     populateHTML(episodes);
 }
+// --- END MODIFIED parseRSSFeed ---
 
-// --- MODIFIED populateHTML FOR EPISODE COUNT ---
-function populateHTML(episodes) {
+function populateHTML(episodes) { /* ... (same as before, with corrected slicing) ... */
     if (!episodes || episodes.length === 0) {
         hideLoadingMessage();
         const appContent = document.getElementById('app-content');
-        if (appContent && appContent.innerHTML.trim() === '') { // Check if app-content is empty before adding no episodes message
+        if (appContent && appContent.innerHTML.trim() === '') {
             appContent.innerHTML = '<p class="text-center p-4 text-gray-500">No episodes available at the moment.</p>';
         }
         return;
     }
-
-    // Ensure player DOM references are fresh, especially if home content is reloaded by router
-    // This is now more reliably handled in initializeHomePage called by router.
-    // initializePlayerDOMReferences();
-
-    if (episodes.length > 0) {
-        populateFeaturedEpisode(episodes[0]); // 1st episode
-    } else {
-        populateFeaturedEpisode(null); // Handle empty case
-    }
-
-    // Order of sections in home_content.html: Featured, Destaques, Mais Ouvidos, Mais Episodios
-    const episodesForDestaques = episodes.slice(1, 4);    // Episodes 2, 3, 4 (3 items)
-    populateDestaques(episodesForDestaques);
-
-    const episodesForMaisOuvidos = episodes.slice(4, 6);  // Episodes 5, 6 (2 items)
-    populateMaisOuvidos(episodesForMaisOuvidos);
-
-    const episodesForMaisEpisodios = episodes.slice(6, 10); // Episodes 7, 8, 9, 10 (4 items) - as requested
-    populateMaisEpisodios(episodesForMaisEpisodios);
-
+    if (episodes.length > 0) { populateFeaturedEpisode(episodes[0]); }
+    else { populateFeaturedEpisode(null); }
+    const episodesForDestaques = episodes.slice(1, 4); populateDestaques(episodesForDestaques);
+    const episodesForMaisOuvidos = episodes.slice(4, 6); populateMaisOuvidos(episodesForMaisOuvidos);
+    const episodesForMaisEpisodios = episodes.slice(6, 10); populateMaisEpisodios(episodesForMaisEpisodios);
     hideLoadingMessage();
 }
-// --- END MODIFIED populateHTML ---
 
+// --- MODIFIED populateFeaturedEpisode ---
 function populateFeaturedEpisode(episode) {
-    if (!episode) { // Handle null episode (e.g. if RSS feed is empty)
+    const defaultThumbnail = 'images/default-podcast-thumb.png';
+
+    if (!episode) {
         const featuredSection = document.querySelector('section.mb-10.bg-gray-100');
         if (featuredSection) {
             const titleEl = featuredSection.querySelector('h2.text-2xl');
             if (titleEl) titleEl.textContent = "No episode available";
-            // Clear other fields or set to default
             if (currentTimeDisplay) currentTimeDisplay.textContent = '00:00';
             if (totalDurationDisplay) totalDurationDisplay.textContent = '00:00';
             if (progressBarFill) progressBarFill.style.width = '0%';
-            if (globalAudioPlayer) globalAudioPlayer.src = ''; // Clear src
+            if (globalAudioPlayer) globalAudioPlayer.src = '';
             updatePlayPauseIcon();
             if (miniPlayerTitle) miniPlayerTitle.textContent = "No track playing";
             if (miniPlayerTitle) miniPlayerTitle.title = "No track playing";
+            if (miniPlayerThumbnail) {
+                miniPlayerThumbnail.src = defaultThumbnail;
+                miniPlayerThumbnail.alt = "Default podcast thumbnail";
+                miniPlayerThumbnail.style.display = 'block';
+            }
         }
         return;
     }
@@ -360,16 +337,31 @@ function populateFeaturedEpisode(episode) {
             if(totalDurationDisplay) totalDurationDisplay.textContent = formatDuration(episode.duration);
             if(progressBarFill) progressBarFill.style.width = '0%';
             updatePlayPauseIcon();
+
             if (miniPlayerTitle) miniPlayerTitle.textContent = episode.title;
             if (miniPlayerTitle) miniPlayerTitle.title = episode.title;
+
+            if (miniPlayerThumbnail) {
+                if (episode.imageUrl) {
+                    miniPlayerThumbnail.src = episode.imageUrl;
+                    miniPlayerThumbnail.alt = episode.title + " thumbnail";
+                    miniPlayerThumbnail.style.display = 'block';
+                } else {
+                    miniPlayerThumbnail.src = defaultThumbnail;
+                    miniPlayerThumbnail.alt = "Default podcast thumbnail";
+                    miniPlayerThumbnail.style.display = 'block';
+                }
+            }
         }
     }
 }
-function escapeHTML(str) {
+// --- END MODIFIED populateFeaturedEpisode ---
+
+function escapeHTML(str) { /* ... (same as before) ... */
     if (str === null || str === undefined) return '';
     return str.replace(/[&<>"']/g, match => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[match]));
 }
-function formatDuration(durationStr) {
+function formatDuration(durationStr) { /* ... (same as before) ... */
     if (!durationStr || durationStr === '0') return '00:00';
     if (String(durationStr).includes(':')) {
         const parts = String(durationStr).split(':');
@@ -379,15 +371,12 @@ function formatDuration(durationStr) {
     }
     const totalSeconds = parseInt(durationStr, 10);
     if (isNaN(totalSeconds)) return '00:00';
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-    const paddedMinutes = String(minutes).padStart(2, '0');
-    const paddedSeconds = String(seconds).padStart(2, '0');
+    const hours = Math.floor(totalSeconds / 3600); const minutes = Math.floor((totalSeconds % 3600) / 60); const seconds = totalSeconds % 60;
+    const paddedMinutes = String(minutes).padStart(2, '0'); const paddedSeconds = String(seconds).padStart(2, '0');
     if (hours > 0) return `${String(hours).padStart(2, '0')}:${paddedMinutes}:${paddedSeconds}`;
     return `${paddedMinutes}:${paddedSeconds}`;
 }
-function createPodcastCardHTML(episode) {
+function createPodcastCardHTML(episode) { /* ... (same as before) ... */
     return `
         <div class="podcast-card flex items-center space-x-4 shadow">
             <a href="${episode.audioUrl}" target="_blank" class="play-button focus:outline-none" aria-label="Play episode ${escapeHTML(episode.title)}">
@@ -397,7 +386,7 @@ function createPodcastCardHTML(episode) {
         </div>
     `;
 }
-function createHighlightCardHTML(episode) {
+function createHighlightCardHTML(episode) { /* ... (same as before) ... */
     return `
         <div class="bg-white rounded-xl shadow-lg overflow-hidden">
             <a href="${episode.audioUrl}" target="_blank" class="w-full h-48 thumbnail-placeholder flex items-center justify-center bg-gray-200 hover:bg-gray-300" aria-label="Play episode ${escapeHTML(episode.title)}"><span class="material-icons text-6xl text-gray-400">mic</span></a>
@@ -405,13 +394,13 @@ function createHighlightCardHTML(episode) {
         </div>
     `;
 }
-function populateSection(sectionTitle, episodes, cardCreationFunction) {
+function populateSection(sectionTitle, episodes, cardCreationFunction) { /* ... (same as before) ... */
     const sectionHeader = Array.from(document.querySelectorAll('h3.text-2xl.font-semibold.text-gray-800.mb-4')).find(h3 => h3.textContent.trim() === sectionTitle);
     if (!sectionHeader) { console.warn(`Section with title "${sectionTitle}" not found.`); return; }
     const cardContainer = sectionHeader.nextElementSibling;
     if (!cardContainer || !cardContainer.classList.contains('grid')) { console.warn(`Card container for section "${sectionTitle}" not found or is not a grid.`); return; }
     cardContainer.innerHTML = '';
-    if (!episodes || episodes.length === 0) { cardContainer.innerHTML = '<p class="text-gray-500 col-span-full">No episodes to display in this section.</p>'; return; } // Added more specific message
+    if (!episodes || episodes.length === 0) { cardContainer.innerHTML = '<p class="text-gray-500 col-span-full">No episodes to display in this section.</p>'; return; }
     episodes.forEach(episode => { const cardHTML = cardCreationFunction(episode); cardContainer.insertAdjacentHTML('beforeend', cardHTML); });
 }
 function populateMaisOuvidos(episodes) { populateSection("Mais Ouvidos", episodes, createPodcastCardHTML); }
@@ -420,4 +409,12 @@ function populateDestaques(episodes) { populateSection("Destaques", episodes, cr
 
 FINAL_JS_EOF
 
-echo "js/main.js entirely rewritten to adjust episode slicing in populateHTML for 'Mais Episodios' count."
+# Ensure default image placeholder directory exists
+mkdir -p images
+# Create a dummy placeholder if it doesn't exist (as done in HTML step)
+if [ ! -f images/default-podcast-thumb.png ]; then
+    touch images/default-podcast-thumb.png
+    echo "Created dummy images/default-podcast-thumb.png"
+fi
+
+echo "js/main.js updated with thumbnail extraction and display logic for mini-player."
