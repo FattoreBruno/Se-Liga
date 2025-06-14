@@ -7,10 +7,10 @@ let rewindBtn, forwardBtn;
 let progressBarContainer, progressBarFill;
 let currentTimeDisplay, totalDurationDisplay;
 
-document.addEventListener('DOMContentLoaded', () => {
-    initializePlayerDOMReferences();
-    fetchRSSFeed();
-});
+// document.addEventListener('DOMContentLoaded', () => { // Original listener removed by cleaning step
+// initializePlayerDOMReferences();
+// fetchRSSFeed();
+// }); // Original listener removed
 
 function initializePlayerDOMReferences() {
     globalAudioPlayer = document.getElementById('global-audio-player');
@@ -34,12 +34,8 @@ function initializePlayerDOMReferences() {
     if (globalAudioPlayer) {
         globalAudioPlayer.addEventListener('play', updatePlayPauseIcon);
         globalAudioPlayer.addEventListener('pause', updatePlayPauseIcon);
-
-        // --- MODIFIED/ENHANCED for this step ---
         globalAudioPlayer.addEventListener('ended', handleAudioEnded);
         globalAudioPlayer.addEventListener('error', handleAudioError);
-        // --- END MODIFIED/ENHANCED ---
-
         globalAudioPlayer.addEventListener('loadedmetadata', updateDurationDisplay);
         globalAudioPlayer.addEventListener('timeupdate', updateTimeAndProgress);
     }
@@ -52,15 +48,13 @@ function initializePlayerDOMReferences() {
 function togglePlayPause() {
     if (!globalAudioPlayer || !globalAudioPlayer.src) {
         console.warn("No audio source loaded.");
-        // Optionally, try to load the first episode if nothing is loaded
-        // displayErrorMessage("No episode selected to play.");
         return;
     }
     if (globalAudioPlayer.paused || globalAudioPlayer.ended) {
         globalAudioPlayer.play().catch(err => {
             console.error("Error playing audio:", err);
             displayErrorMessage(`Error playing audio: ${err.message}`);
-            updatePlayPauseIcon(); // Ensure icon reflects paused state on error
+            updatePlayPauseIcon();
         });
     } else {
         globalAudioPlayer.pause();
@@ -85,13 +79,11 @@ function updatePlayPauseIcon() {
     }
 }
 
-// --- ADDED/MODIFIED for this step ---
 function handleAudioEnded() {
     console.log("Audio playback ended.");
-    updatePlayPauseIcon(); // Set icon to 'play'
-    if (progressBarFill) progressBarFill.style.width = '0%'; // Reset progress bar visually
-    if (currentTimeDisplay) currentTimeDisplay.textContent = formatDuration(0); // Reset current time
-    // Optionally: globalAudioPlayer.currentTime = 0; (though 'ended' implies this)
+    updatePlayPauseIcon();
+    if (progressBarFill) progressBarFill.style.width = '0%';
+    if (currentTimeDisplay) currentTimeDisplay.textContent = formatDuration(0);
 }
 
 function handleAudioError(event) {
@@ -116,12 +108,11 @@ function handleAudioError(event) {
         }
     }
     displayErrorMessage(errorMessage);
-    updatePlayPauseIcon(); // Ensure icon is 'play_arrow'
+    updatePlayPauseIcon();
     if (progressBarFill) progressBarFill.style.width = '0%';
     if (currentTimeDisplay) currentTimeDisplay.textContent = '00:00';
     if (totalDurationDisplay) totalDurationDisplay.textContent = '00:00';
 }
-// --- END ADDED/MODIFIED ---
 
 function updateDurationDisplay() {
     if (totalDurationDisplay && globalAudioPlayer && !isNaN(globalAudioPlayer.duration)) {
@@ -263,9 +254,8 @@ function populateFeaturedEpisode(episode) {
             if (globalAudioPlayer.currentSrc !== episode.audioUrl || globalAudioPlayer.src !== episode.audioUrl ) {
                 globalAudioPlayer.src = episode.audioUrl;
             }
-             // Reset UI for new/reloaded track
             if(currentTimeDisplay) currentTimeDisplay.textContent = '00:00';
-            if(totalDurationDisplay) totalDurationDisplay.textContent = formatDuration(episode.duration); // Pre-emptive
+            if(totalDurationDisplay) totalDurationDisplay.textContent = formatDuration(episode.duration);
             if(progressBarFill) progressBarFill.style.width = '0%';
             updatePlayPauseIcon();
         }
@@ -351,3 +341,26 @@ function populateSection(sectionTitle, episodes, cardCreationFunction) {
 function populateMaisOuvidos(episodes) { populateSection("Mais Ouvidos", episodes, createPodcastCardHTML); }
 function populateMaisEpisodios(episodes) { populateSection("Mais Episódios", episodes, createPodcastCardHTML); }
 function populateDestaques(episodes) { populateSection("Destaques", episodes, createHighlightCardHTML); }
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Main.js DOMContentLoaded: Initializing shell components.');
+    if (typeof initializePlayerDOMReferences === 'function') {
+        initializePlayerDOMReferences();
+    }
+});
+
+function initializeHomePage() {
+    console.log('initializeHomePage called from router.');
+    if (typeof initializePlayerDOMReferences === 'function') {
+        initializePlayerDOMReferences();
+    } else {
+        console.error('initializePlayerDOMReferences function is not defined when trying to init home page.');
+    }
+
+    if (typeof fetchRSSFeed === 'function') {
+        fetchRSSFeed();
+    } else {
+        console.error('fetchRSSFeed function is not defined when trying to init home page.');
+    }
+}
+window.initializeHomePage = initializeHomePage;
