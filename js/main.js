@@ -1,6 +1,6 @@
 const RSS_URL = 'https://anchor.fm/s/105d2ac84/podcast/rss';
 
-// Player and UI Element Variables (declarations remain the same)
+// Player and UI Element Variables
 let globalAudioPlayer;
 let playPauseBtn, playPauseIcon;
 let rewindBtn, forwardBtn;
@@ -19,11 +19,7 @@ let headerPlayerPlayPauseIcon;
 let headerPlayerProgressFill;
 let headerPlayerProgressContainer;
 
-// --- NEW/MODIFIED STATUS FUNCTION ---
 function updateRssStatus(message, isError = false) {
-    // This function assumes home_content.html (with #rss-status-display) is loaded.
-    // If called when other content is loaded, it might not find the element.
-    // This is acceptable as RSS status is primarily for the home page.
     const statusDisplay = document.getElementById('rss-status-display');
     if (statusDisplay) {
         if (message === null || message.trim() === '') {
@@ -33,19 +29,13 @@ function updateRssStatus(message, isError = false) {
             statusDisplay.innerHTML = message;
             statusDisplay.style.display = 'block';
             if (isError) {
-                statusDisplay.className = 'my-4 p-4 text-center text-lg text-red-700 border border-red-300 bg-red-50 rounded-md'; // Tailwind error style
+                statusDisplay.className = 'my-4 p-4 text-center text-lg text-red-700 border border-red-300 bg-red-50 rounded-md';
             } else {
-                 statusDisplay.className = 'my-4 p-4 text-center text-lg text-blue-700 border border-blue-300 bg-blue-50 rounded-md'; // Tailwind info style
+                 statusDisplay.className = 'my-4 p-4 text-center text-lg text-blue-700 border border-blue-300 bg-blue-50 rounded-md';
             }
         }
-    } else {
-        // Only log if #rss-status-display is expected (e.g. on home page)
-        // This might get noisy if other pages don't have it.
-        // console.warn("#rss-status-display element not found. Status: " + message);
     }
 }
-// --- END NEW/MODIFIED STATUS FUNCTION ---
-
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Main.js DOMContentLoaded: Initializing shell components.');
@@ -64,7 +54,7 @@ window.initializeHomePage = function() {
     }
 };
 
-function initializePlayerDOMReferences() { /* ... (remains largely the same, no changes for this step) ... */
+function initializePlayerDOMReferences() {
     globalAudioPlayer = document.getElementById('global-audio-player');
     playPauseBtn = document.getElementById('play-pause-btn');
     playPauseIcon = document.getElementById('play-pause-icon');
@@ -92,7 +82,10 @@ function initializePlayerDOMReferences() { /* ... (remains largely the same, no 
     headerPlayerProgressContainer = document.getElementById('header-player-progress-container');
 
     if (!globalAudioPlayer) console.warn("Global audio player element not found.");
-    // ... other checks ...
+    if (!playPauseBtn && document.getElementById('play-pause-btn')) console.warn("Main play/pause button (featured) not found by JS, but exists in HTML.");
+    if (!miniPlayerDiv) console.warn("Mini-player container not found.");
+    if (!headerPlayerPlayPauseButton) console.warn("Header player play/pause button not found.");
+    if (!miniPlayerThumbnail) console.warn("Mini-player thumbnail element not found.");
 
     if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlayPause);
     if (rewindBtn) rewindBtn.addEventListener('click', () => skipTime(-5));
@@ -102,7 +95,7 @@ function initializePlayerDOMReferences() { /* ... (remains largely the same, no 
     if (miniPlayerRewindBtn) miniPlayerRewindBtn.addEventListener('click', () => skipTime(-5));
     if (miniPlayerForwardBtn) miniPlayerForwardBtn.addEventListener('click', () => skipTime(5));
     if (miniPlayerProgressBarContainer) miniPlayerProgressBarContainer.addEventListener('click', handleProgressBarSeek);
-    if (miniPlayerCloseBtn) { /* ... close logic ... */
+    if (miniPlayerCloseBtn) {
         miniPlayerCloseBtn.addEventListener('click', () => {
             if (miniPlayerDiv) {
                 miniPlayerDiv.classList.add('hidden', 'opacity-0');
@@ -113,7 +106,7 @@ function initializePlayerDOMReferences() { /* ... (remains largely the same, no 
     if (headerPlayerPlayPauseButton) headerPlayerPlayPauseButton.addEventListener('click', togglePlayPause);
     if (headerPlayerProgressContainer) headerPlayerProgressContainer.addEventListener('click', handleProgressBarSeek);
 
-    if (globalAudioPlayer) { /* ... globalAudioPlayer listeners ... */
+    if (globalAudioPlayer) {
         globalAudioPlayer.addEventListener('play', handleAudioPlay);
         globalAudioPlayer.addEventListener('pause', updatePlayPauseIcon);
         globalAudioPlayer.addEventListener('ended', handleAudioEnded);
@@ -123,53 +116,42 @@ function initializePlayerDOMReferences() { /* ... (remains largely the same, no 
     }
 }
 
-
-// --- MODIFIED fetchRSSFeed ---
 async function fetchRSSFeed() {
     console.log('Fetching RSS feed...');
-    updateRssStatus("Loading episodes..."); // MODIFIED
+    updateRssStatus("Loading episodes...");
     try {
         const response = await fetch(RSS_URL);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status} (${response.statusText})`);
         }
         const xmlText = await response.text();
-        // updateRssStatus("Feed fetched, parsing..."); // Optional intermediate status
         parseRSSFeed(xmlText);
     } catch (error) {
         console.error('Error fetching RSS feed:', error);
-        updateRssStatus(`Failed to load podcast feed. ${error.message}`, true); // MODIFIED
+        updateRssStatus(`Failed to load podcast feed. ${error.message}`, true);
     }
 }
-// --- END MODIFIED fetchRSSFeed ---
 
-// --- MODIFIED parseRSSFeed ---
 function parseRSSFeed(xmlText) {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
     const parsingError = xmlDoc.getElementsByTagName('parsererror');
     if (parsingError.length > 0) {
         console.error('Error parsing XML:', parsingError[0].textContent);
-        updateRssStatus(`Error processing podcast data: ${parsingError[0].textContent}`, true); // MODIFIED
+        updateRssStatus(`Error processing podcast data: ${parsingError[0].textContent}`, true);
         return;
     }
-
-    // ... (image extraction logic remains same) ...
     let channelImage = null;
     const channelImageNode = xmlDoc.querySelector('channel > image > url, channel > itunes\\:image[href]');
     if (channelImageNode) {
         channelImage = channelImageNode.textContent || channelImageNode.getAttribute('href');
     }
-
-
     const items = xmlDoc.querySelectorAll('item');
     if (!items || items.length === 0) {
-        updateRssStatus("No episodes found in the feed.", false); // MODIFIED (false for non-error)
+        updateRssStatus("No episodes found in the feed.", false);
         return;
     }
-
-    // updateRssStatus(`Found ${items.length} episodes. Populating...`); // Optional
-    const episodes = Array.from(items).map(item => { /* ... (episode mapping remains same) ... */
+    const episodes = Array.from(items).map(item => {
         const title = item.querySelector('title')?.textContent || 'No title';
         const link = item.querySelector('link')?.textContent || '#';
         const description = item.querySelector('description')?.textContent || 'No description';
@@ -179,15 +161,14 @@ function parseRSSFeed(xmlText) {
         let duration = '0';
         const itunesDurationNode = Array.from(item.childNodes).find(node => node.nodeName === 'itunes:duration' || node.localName === 'duration');
         if (itunesDurationNode) duration = itunesDurationNode.textContent;
-        let imageUrl = null; /* ... image extraction ... */
+        let imageUrl = null;
         const itunesImage = item.querySelector('itunes\\:image[href]'); if (itunesImage) imageUrl = itunesImage.getAttribute('href'); else { const mediaThumbnail = item.querySelector('media\\:thumbnail[url]'); if (mediaThumbnail) imageUrl = mediaThumbnail.getAttribute('url'); else { const imageInDescription = item.querySelector('description img'); if(imageInDescription) imageUrl = imageInDescription.src; }} if (!imageUrl && channelImage) imageUrl = channelImage;
         return { title, link, description, pubDate, audioUrl, duration, imageUrl };
     });
     populateHTML(episodes);
 }
-// --- END MODIFIED parseRSSFeed ---
 
-// --- MODIFIED populateHTML ---
+// --- MODIFIED populateHTML FOR EPISODE COUNT ---
 function populateHTML(episodes) {
     if (!episodes || episodes.length === 0) {
         // updateRssStatus is already called by parseRSSFeed if no items.
@@ -198,31 +179,60 @@ function populateHTML(episodes) {
 
     updateRssStatus(null); // Clear status message as we are about to show episodes
 
-    if (episodes.length > 0) { populateFeaturedEpisode(episodes[0]); }
-    else { populateFeaturedEpisode(null); }
-    const episodesForDestaques = episodes.slice(1, 4); populateDestaques(episodesForDestaques);
-    const episodesForMaisOuvidos = episodes.slice(4, 6); populateMaisOuvidos(episodesForMaisOuvidos);
-    const episodesForMaisEpisodios = episodes.slice(6, 10); populateMaisEpisodios(episodesForMaisEpisodios);
+    if (episodes.length > 0) {
+        populateFeaturedEpisode(episodes[0]); // 1st episode
+    } else {
+        populateFeaturedEpisode(null); // Handle empty case for featured section
+    }
+
+    // Order of sections in home_content.html: Featured, Destaques, Mais Ouvidos, Mais Episodios
+    const episodesForDestaques = episodes.slice(1, 4);    // Episodes 2, 3, 4 (3 items)
+    populateDestaques(episodesForDestaques);
+
+    const episodesForMaisOuvidos = episodes.slice(4, 7);  // Episodes 5, 6, 7 (3 items) - Updated
+    populateMaisOuvidos(episodesForMaisOuvidos);
+
+    const episodesForMaisEpisodios = episodes.slice(7, 11); // Episodes 8, 9, 10, 11 (4 items) - Updated
+    populateMaisEpisodios(episodesForMaisEpisodios);
 }
 // --- END MODIFIED populateHTML ---
 
+function populateFeaturedEpisode(episode) { /* ... (same as before) ... */
+    const defaultThumbnail = 'images/default-podcast-thumb.png';
+    if (!episode) {
+        const featuredSection = document.querySelector('section.mb-10.bg-gray-100');
+        if (featuredSection) {
+            const titleEl = featuredSection.querySelector('h2.text-2xl');
+            if (titleEl) titleEl.textContent = "No episode available";
+            if (currentTimeDisplay) currentTimeDisplay.textContent = '00:00';
+            if (totalDurationDisplay) totalDurationDisplay.textContent = '00:00';
+            if (progressBarFill) progressBarFill.style.width = '0%';
+            if (globalAudioPlayer) globalAudioPlayer.src = '';
+            updatePlayPauseIcon();
+            if (miniPlayerTitle) miniPlayerTitle.textContent = "No track playing";
+            if (miniPlayerTitle) miniPlayerTitle.title = "No track playing";
+            if (miniPlayerThumbnail) { miniPlayerThumbnail.src = defaultThumbnail; miniPlayerThumbnail.alt = "Default podcast thumbnail"; miniPlayerThumbnail.style.display = 'block';  }
+        } return;
+    }
+    const featuredSection = document.querySelector('section.mb-10.bg-gray-100');
+    if (featuredSection) {
+        const titleEl = featuredSection.querySelector('h2.text-2xl');
+        if (titleEl) titleEl.textContent = episode.title;
+        if (globalAudioPlayer) {
+            if (globalAudioPlayer.currentSrc !== episode.audioUrl || globalAudioPlayer.src !== episode.audioUrl ) { globalAudioPlayer.src = episode.audioUrl; }
+            if(currentTimeDisplay) currentTimeDisplay.textContent = '00:00';
+            if(totalDurationDisplay) totalDurationDisplay.textContent = formatDuration(episode.duration);
+            if(progressBarFill) progressBarFill.style.width = '0%';
+            updatePlayPauseIcon();
+            if (miniPlayerTitle) miniPlayerTitle.textContent = episode.title;
+            if (miniPlayerTitle) miniPlayerTitle.title = episode.title;
+            if (miniPlayerThumbnail) { if (episode.imageUrl) { miniPlayerThumbnail.src = episode.imageUrl; miniPlayerThumbnail.alt = episode.title + " thumbnail"; miniPlayerThumbnail.style.display = 'block';  } else { miniPlayerThumbnail.src = defaultThumbnail; miniPlayerThumbnail.alt = "Default podcast thumbnail"; miniPlayerThumbnail.style.display = 'block';  }}
+        }
+    }
+}
 
-// --- REMOVE OLD showLoadingMessage, hideLoadingMessage, displayErrorMessage ---
-// These are now replaced by updateRssStatus for RSS-related feedback.
-// A generic displayErrorMessage might still be useful for other UI errors if needed,
-// but for this plan, we focus on RSS status. We'll comment them out.
-
-/*
-function showLoadingMessage() { ... }
-function hideLoadingMessage() { ... }
-function displayErrorMessage(message) { ... }
-*/
-
-// Player control functions (togglePlayPause, skipTime, etc.) remain the same
-// UI update functions (updatePlayPauseIcon, handleAudioPlay, etc.) remain the same
-// populateFeaturedEpisode, escapeHTML, formatDuration, card creation, populateSection remain the same
-// (Copying them here for completeness of the file, assuming no changes other than those highlighted for status)
-
+// --- Other functions (togglePlayPause, skipTime, UI updates, helpers, card creation, section population) ---
+// --- These are assumed to be correct and complete from previous steps ---
 function togglePlayPause() { if (!globalAudioPlayer || !globalAudioPlayer.src) { console.warn("No audio source loaded."); return; } if (globalAudioPlayer.paused || globalAudioPlayer.ended) { globalAudioPlayer.play().catch(err => { console.error("Error playing audio:", err); updateRssStatus(`Error playing audio: ${err.message}`, true); updatePlayPauseIcon(); }); } else { globalAudioPlayer.pause(); } }
 function skipTime(seconds) { if (!globalAudioPlayer || !globalAudioPlayer.duration || isNaN(globalAudioPlayer.duration)) { console.warn("Cannot skip: Audio not loaded or duration unknown."); return; } const newTime = globalAudioPlayer.currentTime + seconds; globalAudioPlayer.currentTime = Math.max(0, Math.min(newTime, globalAudioPlayer.duration)); }
 function updatePlayPauseIcon() { const isPaused = globalAudioPlayer && (globalAudioPlayer.paused || globalAudioPlayer.ended); const iconText = isPaused ? 'play_arrow' : 'pause'; if (playPauseIcon) playPauseIcon.textContent = iconText;  if (miniPlayerPlayPauseIcon) miniPlayerPlayPauseIcon.textContent = iconText; if (headerPlayerPlayPauseIcon) headerPlayerPlayPauseIcon.textContent = iconText;}
@@ -232,7 +242,6 @@ function updateTimeAndProgress() { const currentTimeText = (globalAudioPlayer &&
 function handleAudioEnded() { console.log("Audio playback ended."); updatePlayPauseIcon();  if (progressBarFill) progressBarFill.style.width = '0%'; if (miniPlayerProgressFill) miniPlayerProgressFill.style.width = '0%'; if (headerPlayerProgressFill) headerPlayerProgressFill.style.width = '0%'; if (currentTimeDisplay) currentTimeDisplay.textContent = formatDuration(0); if (miniPlayerCurrentTime) miniPlayerCurrentTime.textContent = formatDuration(0); }
 function handleAudioError(event) { console.error("Audio player error:", event); let errorMessage = "An error occurred with the audio player."; if (globalAudioPlayer.error) { switch (globalAudioPlayer.error.code) { case MediaError.MEDIA_ERR_ABORTED: errorMessage = "Audio playback was aborted."; break; case MediaError.MEDIA_ERR_NETWORK: errorMessage = "A network error for audio."; break; case MediaError.MEDIA_ERR_DECODE: errorMessage = "Audio could not be decoded."; break; case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED: errorMessage = "Audio format not supported."; break; default: errorMessage = "Unknown audio error."; }} updateRssStatus(errorMessage, true); updatePlayPauseIcon(); if (progressBarFill) progressBarFill.style.width = '0%'; if (miniPlayerProgressFill) miniPlayerProgressFill.style.width = '0%'; if (headerPlayerProgressFill) headerPlayerProgressFill.style.width = '0%';  if (currentTimeDisplay) currentTimeDisplay.textContent = '00:00'; if (miniPlayerCurrentTime) miniPlayerCurrentTime.textContent = '00:00'; if (totalDurationDisplay) totalDurationDisplay.textContent = '00:00'; if (miniPlayerTotalDuration) miniPlayerTotalDuration.textContent = '00:00'; }
 function handleProgressBarSeek(event) { if (!globalAudioPlayer || !globalAudioPlayer.duration || isNaN(globalAudioPlayer.duration)) { console.warn("Cannot seek: Audio duration unknown."); return; } const clickedProgressBarContainer = event.currentTarget;  const progressBarRect = clickedProgressBarContainer.getBoundingClientRect(); const clickPositionX = event.clientX - progressBarRect.left; const boundedClickPositionX = Math.max(0, Math.min(clickPositionX, progressBarRect.width)); const seekRatio = boundedClickPositionX / progressBarRect.width; const seekTime = globalAudioPlayer.duration * seekRatio; globalAudioPlayer.currentTime = seekTime; }
-function populateFeaturedEpisode(episode) { const defaultThumbnail = 'images/default-podcast-thumb.png';  if (!episode) { const featuredSection = document.querySelector('section.mb-10.bg-gray-100'); if (featuredSection) { const titleEl = featuredSection.querySelector('h2.text-2xl'); if (titleEl) titleEl.textContent = "No episode available"; if (currentTimeDisplay) currentTimeDisplay.textContent = '00:00'; if (totalDurationDisplay) totalDurationDisplay.textContent = '00:00'; if (progressBarFill) progressBarFill.style.width = '0%'; if (globalAudioPlayer) globalAudioPlayer.src = '';  updatePlayPauseIcon(); if (miniPlayerTitle) miniPlayerTitle.textContent = "No track playing";  if (miniPlayerTitle) miniPlayerTitle.title = "No track playing"; if (miniPlayerThumbnail) { miniPlayerThumbnail.src = defaultThumbnail; miniPlayerThumbnail.alt = "Default podcast thumbnail"; miniPlayerThumbnail.style.display = 'block';  }} return; } const featuredSection = document.querySelector('section.mb-10.bg-gray-100'); if (featuredSection) { const titleEl = featuredSection.querySelector('h2.text-2xl'); if (titleEl) titleEl.textContent = episode.title; if (globalAudioPlayer) { if (globalAudioPlayer.currentSrc !== episode.audioUrl || globalAudioPlayer.src !== episode.audioUrl ) { globalAudioPlayer.src = episode.audioUrl; } if(currentTimeDisplay) currentTimeDisplay.textContent = '00:00'; if(totalDurationDisplay) totalDurationDisplay.textContent = formatDuration(episode.duration); if(progressBarFill) progressBarFill.style.width = '0%'; updatePlayPauseIcon();  if (miniPlayerTitle) miniPlayerTitle.textContent = episode.title;  if (miniPlayerTitle) miniPlayerTitle.title = episode.title;  if (miniPlayerThumbnail) { if (episode.imageUrl) { miniPlayerThumbnail.src = episode.imageUrl; miniPlayerThumbnail.alt = episode.title + " thumbnail"; miniPlayerThumbnail.style.display = 'block';  } else { miniPlayerThumbnail.src = defaultThumbnail; miniPlayerThumbnail.alt = "Default podcast thumbnail"; miniPlayerThumbnail.style.display = 'block';  }}}}}
 function escapeHTML(str) { if (str === null || str === undefined) return ''; return str.replace(/[&<>"']/g, match => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[match])); }
 function formatDuration(durationStr) { if (!durationStr || durationStr === '0') return '00:00'; if (String(durationStr).includes(':')) { const parts = String(durationStr).split(':'); if (parts.length === 2) return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`; if (parts.length === 3) return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}:${parts[2].padStart(2, '0')}`; return String(durationStr); } const totalSeconds = parseInt(durationStr, 10); if (isNaN(totalSeconds)) return '00:00'; const hours = Math.floor(totalSeconds / 3600); const minutes = Math.floor((totalSeconds % 3600) / 60); const seconds = totalSeconds % 60; const paddedMinutes = String(minutes).padStart(2, '0'); const paddedSeconds = String(seconds).padStart(2, '0'); if (hours > 0) return `${String(hours).padStart(2, '0')}:${paddedMinutes}:${paddedSeconds}`; return `${paddedMinutes}:${paddedSeconds}`; }
 function createPodcastCardHTML(episode) { return `<div class="podcast-card flex items-center space-x-4 shadow"><a href="${episode.audioUrl}" target="_blank" class="play-button focus:outline-none" aria-label="Play episode ${escapeHTML(episode.title)}"><span class="material-icons text-gray-700">play_arrow</span></a><div><h4 class="font-medium text-gray-700 truncate" title="${escapeHTML(episode.title)}"><a href="${episode.link}" target="_blank">${escapeHTML(episode.title)}</a></h4><p class="text-sm text-gray-500">${formatDuration(episode.duration)}</p></div></div>`; }
@@ -244,4 +253,4 @@ function populateDestaques(episodes) { populateSection("Destaques", episodes, cr
 
 FINAL_JS_EOF
 
-echo "js/main.js updated with on-page RSS status display logic and related function calls."
+echo "js/main.js updated: populateHTML function adjusted for new episode counts (Destaques: 3, Mais Ouvidos: 3, Mais Episodios: 4)."
