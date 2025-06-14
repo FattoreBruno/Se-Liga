@@ -74,3 +74,44 @@ body {
     /* Maybe a slightly different background or border on hover to indicate clickability */
     background-color: #c7c7c7;
 }
+
+/* --- Mini Player Specifics --- */
+#mini-player {
+    /* Tailwind classes 'hidden' and 'opacity-0' handle initial state. */
+    /* 'visible' class will be toggled by JS to trigger transition. */
+    /* transition-opacity duration-300 ease-in-out is already on the element via Tailwind */
+}
+
+#mini-player.visible {
+    /* display: block; Is implicit if hidden class is removed */
+    opacity: 1;
+}
+
+#mini-player-title {
+    /* Tailwind 'truncate' is good. Ensure enough space if close button overlaps. */
+    /* The padding-right: 20px; is to prevent text from going under the close button */
+    padding-right: 25px; /* Increased slightly for safety */
+}
+
+/* Ensuring Material Icons align well and have consistent size if not overridden by Tailwind */
+#mini-player .material-icons {
+    vertical-align: middle; /* Good default */
+}
+
+/* Specific icon sizes defined in the HTML via style attributes are usually sufficient, */
+/* but these can be fallbacks or overrides if needed. */
+/* Example: */
+/* #mini-player-rewind-btn .material-icons,
+#mini-player-forward-btn .material-icons {
+    font-size: 20px;
+}
+#mini-player-play-pause-btn .material-icons {
+    font-size: 28px;
+}
+#mini-player-close-btn .material-icons {
+    font-size: 16px;
+} */
+
+#mini-player-progress-fill {
+    transition: width 0.1s linear; /* Smooth progress update if not already set by Tailwind */
+}
