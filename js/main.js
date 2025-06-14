@@ -21,13 +21,16 @@ let headerPlayerProgressFill;
 let headerPlayerProgressContainer;
 
 function updateRssStatus(message, isError = false) {
+    try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - updateRssStatus CALLED. Msg: " + (message ? String(message).substring(0, 30) : "null"); } catch(e){}
     const statusDisplay = document.getElementById('rss-status-display');
+    if (statusDisplay) { try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - updateRssStatus - #rss-status-display FOUND"; } catch(e){} } else { try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - updateRssStatus - #rss-status-display NOT FOUND!"; } catch(e){} }
     if (statusDisplay) {
         if (message === null || message.trim() === '') {
             statusDisplay.innerHTML = '';
             statusDisplay.style.display = 'none';
         } else {
             statusDisplay.innerHTML = message;
+            try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - updateRssStatus - #rss-status-display TEXT SET to: " + (message ? String(message).substring(0,30) : "cleared"); } catch(e){}
             statusDisplay.style.display = 'block';
             if (isError) {
                 statusDisplay.className = 'my-4 p-4 text-center text-lg text-red-700 border border-red-300 bg-red-50 rounded-md';
@@ -49,11 +52,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.initializeHomePage = function() {
-    try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - initializeHomePage called"; } catch(e){}
+    try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - initializeHomePage START"; } catch(e){}
     console.log('initializeHomePage called from router.');
     if (typeof initializePlayerDOMReferences === 'function') {
         initializePlayerDOMReferences();
     }
+    try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - initializeHomePage BEFORE fetchRSSFeed"; } catch(e){}
     if (typeof fetchRSSFeed === 'function') {
         fetchRSSFeed();
     }
@@ -122,8 +126,9 @@ function initializePlayerDOMReferences() {
 }
 
 async function fetchRSSFeed() {
-    try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - fetchRSSFeed started"; } catch(e){}
+    try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - fetchRSSFeed START"; } catch(e){}
     console.log('Fetching RSS feed...');
+    try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - fetchRSSFeed BEFORE initial updateRssStatus"; } catch(e){}
     updateRssStatus("Loading episodes...");
     try {
         const response = await fetch(RSS_URL);
