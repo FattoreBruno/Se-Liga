@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Se Liga - Contato</title>
+    <meta name="description" content="Entre em contato com a equipe do podcast Se Liga. Envie suas dúvidas, sugestões ou comentários.">
+    <meta property="og:title" content="Se Liga - Contato" />
+    <meta property="og:type" content="website" />
+    <meta property="og:description" content="Entre em contato com a equipe do podcast Se Liga. Envie suas dúvidas, sugestões ou comentários." />
+    <meta property="og:url" content="https://seliga.com/pages/contato.html" />
+    <meta property="og:site_name" content="Se Liga Podcast" />
+    <!-- Adicionar og:image quando tivermos uma imagem logo/padrão -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="episodios.html">Episódios</a></li>
+                <li><a href="sobre.html">Sobre</a></li>
+                <li><a href="contato.html">Contato</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Conteúdo principal da página -->
+        <h1>Entre em Contato</h1>
+
+        <section class="formulario-contato">
+            <form action="#" method="post">
+                <div>
+                    <label for="nome">Nome:</label>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
+                <div>
+                    <label for="email">E-mail:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div>
+                    <label for="assunto">Assunto:</label>
+                    <input type="text" id="assunto" name="assunto" required>
+                </div>
+                <div>
+                    <label for="mensagem">Mensagem:</label>
+                    <textarea id="mensagem" name="mensagem" rows="5" required></textarea>
+                </div>
+                <div>
+                    <button type="submit">Enviar Mensagem</button>
+                </div>
+            </form>
+        </section>
+
+        <div id="mensagem-confirmacao" style="display:none;">
+            <p>Mensagem enviada com sucesso! Entraremos em contato em breve.</p>
+        </div>
+    </main>
+
+    <footer>
+        <section class="newsletter-signup">
+            <h3>Assine nossa Newsletter</h3>
+            <p>Assine nossa newsletter para receber avisos de novos episódios diretamente no seu e-mail!</p>
+            <form action="#" method="post">
+                <label for="newsletter-email-contato" class="sr-only">Seu e-mail</label>
+                <input type="email" id="newsletter-email-contato" name="newsletter_email" placeholder="Seu melhor e-mail" required>
+                <button type="submit">Inscrever</button>
+            </form>
+        </section>
+        <p>&copy; 2024 Se Liga Podcast. Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- Futuramente, links para JS aqui -->
+</body>
+</html>

@@ -1,0 +1,117 @@
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f9fafb;
+}
+.play-button {
+    background-color: white;
+    border-radius: 50%;
+    padding: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.progress-bar {
+    height: 4px;
+    background-color: #e5e7eb;
+    border-radius: 2px;
+}
+.progress-bar-inner {
+    height: 100%;
+    background-color: #4f46e5;
+    border-radius: 2px;
+}
+.podcast-card {
+    background-color: #f3f4f6;
+    border-radius: 12px;
+    padding: 16px;
+}
+.thumbnail-placeholder {
+    background-color: #e5e7eb;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- Audio Player Styles --- */
+#audio-player-controls button .material-icons {
+    font-size: 28px; /* Consistent icon size */
+    vertical-align: middle;
+}
+
+#play-pause-btn .material-icons {
+    font-size: 32px; /* Larger play/pause icon */
+}
+
+#progress-bar-container {
+    /* Ensure it has a min-width or takes up available space well */
+    min-width: 100px;
+    /* Adding a bit of vertical centering if text alongside is different size */
+    display: flex;
+    align-items: center;
+}
+
+#progress-bar-fill {
+    transition: width 0.1s linear; /* Smooth progress update */
+}
+
+/* Add some hover states for better interactivity if not covered by Tailwind */
+#audio-player-controls button:hover:not(#play-pause-btn) {
+    background-color: #e0e0e0; /* Light gray for non-primary buttons */
+}
+
+#progress-bar-container:hover {
+    /* Maybe a slightly different background or border on hover to indicate clickability */
+    background-color: #c7c7c7;
+}
+
+/* --- Mini Player Specifics --- */
+#mini-player {
+    /* Tailwind classes 'hidden' and 'opacity-0' handle initial state. */
+    /* 'visible' class will be toggled by JS to trigger transition. */
+    /* transition-opacity duration-300 ease-in-out is already on the element via Tailwind */
+}
+
+#mini-player.visible {
+    /* display: block; Is implicit if hidden class is removed */
+    opacity: 1;
+}
+
+#mini-player-title {
+    /* Tailwind 'truncate' is good. Ensure enough space if close button overlaps. */
+    /* The padding-right: 20px; is to prevent text from going under the close button */
+    padding-right: 25px; /* Increased slightly for safety */
+}
+
+/* Ensuring Material Icons align well and have consistent size if not overridden by Tailwind */
+#mini-player .material-icons {
+    vertical-align: middle; /* Good default */
+}
+
+/* Specific icon sizes defined in the HTML via style attributes are usually sufficient, */
+/* but these can be fallbacks or overrides if needed. */
+/* Example: */
+/* #mini-player-rewind-btn .material-icons,
+#mini-player-forward-btn .material-icons {
+    font-size: 20px;
+}
+#mini-player-play-pause-btn .material-icons {
+    font-size: 28px;
+}
+#mini-player-close-btn .material-icons {
+    font-size: 16px;
+} */
+
+#mini-player-progress-fill {
+    transition: width 0.1s linear; /* Smooth progress update if not already set by Tailwind */
+}

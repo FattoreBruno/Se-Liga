@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Se Liga Podcast - Page Not Found</title>
+    <script type="text/javascript">
+      // Define the base path for your GitHub Pages site.
+      // If your site is at username.github.io/RepoName/, basePath is /RepoName
+      // If your site is at username.github.io/, basePath is empty string ''
+      const basePath = '/Se-Liga';
+
+      // Get the current path that led to this 404 page.
+      const originalPath = window.location.pathname;
+
+      // Preserve the original query string and hash.
+      const queryString = window.location.search;
+      const hash = window.location.hash;
+
+      // Calculate the path that the SPA router should handle.
+      // This removes the basePath from the beginning of the originalPath.
+      let spaPath = originalPath;
+      if (originalPath.startsWith(basePath + '/')) {
+        spaPath = originalPath.substring(basePath.length);
+      } else if (originalPath === basePath) {
+        // If the path is just the basePath (e.g. /RepoName), spaPath should be /
+        spaPath = '/';
+      }
+      // If originalPath does not start with basePath (e.g. for custom domains or user pages),
+      // spaPath remains originalPath, and the router should handle it (e.g. /about for /about)
+
+      // Construct the redirect URL to index.html.
+      // Pass the spaPath as a query parameter 'spa_path'.
+      // Also forward the original query string and hash.
+      const redirectUrl = basePath + '/index.html?spa_path=' + encodeURIComponent(spaPath) + queryString + hash;
+
+      // Perform the redirect.
+      // Using replace so the 404 page itself isn't in browser history.
+      window.location.replace(redirectUrl);
+    </script>
+  </head>
+  <body>
+    <p>If you are not redirected automatically, please <a id="redirect-link" href="/Se-Liga/index.html">click here to go to the application</a>.</p>
+    <script type="text/javascript">
+      // Set fallback link href dynamically, just in case.
+      // This ensures the link is correct even if basePath definition changes.
+      const fallbackLink = document.getElementById('redirect-link');
+      if (fallbackLink) {
+        const currentBasePath = '/Se-Liga'; // Must be consistent with above
+        fallbackLink.href = currentBasePath + '/index.html';
+      }
+    </script>
+  </body>
+</html>

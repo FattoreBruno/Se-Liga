@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Podcast Home</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="p-6 md:p-8">
+<header class="flex flex-col md:flex-row justify-between items-center mb-8 p-4 bg-gray-100 shadow-md">
+    <div class="banner mb-4 md:mb-0">
+        <h1 class="text-4xl font-bold text-indigo-600">Se Liga</h1>
+        <p class="text-sm text-gray-600">📰 As notícias do dia em segundos! Fique por dentro antes de sair de casa! 🚀🕒</p>
+    </div>
+    <nav>
+        <ul class="flex space-x-4">
+            <li><a href="index.html" class="text-gray-700 hover:text-indigo-600 font-medium">Home</a></li>
+            <li><a href="pages/episodios.html" class="text-gray-700 hover:text-indigo-600 font-medium">Episódios</a></li>
+            <li><a href="pages/sobre.html" class="text-gray-700 hover:text-indigo-600 font-medium">Sobre</a></li>
+            <li><a href="pages/contato.html" class="text-gray-700 hover:text-indigo-600 font-medium">Contato</a></li>
+        </ul>
+    </nav>
+</header>
+<section class="mb-10 bg-gray-100 p-6 rounded-xl shadow-lg">
+<div class="flex flex-col md:flex-row items-center md:space-x-6">
+<div class="w-48 h-48 thumbnail-placeholder mb-4 md:mb-0">
+<span class="material-icons text-5xl text-gray-400">play_circle_outline</span>
+</div>
+<div>
+<h2 class="text-2xl font-semibold text-gray-800 mb-1">Episode Title</h2>
+<p class="text-gray-500 mb-3">22:15</p>
+<div class="w-full progress-bar">
+<div class="progress-bar-inner" style="width: 30%;"></div>
+</div>
+<div class="mt-4 pt-4 border-t border-gray-300">
+    <div id="audio-player-controls" class="flex items-center space-x-4">
+        <button id="rewind-5s-btn" class="p-2 focus:outline-none hover:bg-gray-200 rounded-full">
+            <span class="material-icons text-gray-700">replay_5</span>
+        </button>
+        <button id="play-pause-btn" class="p-2 bg-indigo-600 text-white rounded-full shadow-md hover:bg-indigo-700 focus:outline-none">
+            <span id="play-pause-icon" class="material-icons">play_arrow</span>
+        </button>
+        <button id="forward-5s-btn" class="p-2 focus:outline-none hover:bg-gray-200 rounded-full">
+            <span class="material-icons text-gray-700">forward_5</span>
+        </button>
+    </div>
+    <div class="mt-3 flex items-center space-x-3">
+        <span id="current-time-display" class="text-sm text-gray-600">00:00</span>
+        <div id="progress-bar-container" class="w-full h-2 bg-gray-300 rounded-full cursor-pointer">
+            <div id="progress-bar-fill" class="h-full bg-indigo-500 rounded-full" style="width: 0%;"></div>
+        </div>
+        <span id="total-duration-display" class="text-sm text-gray-600">00:00</span>
+    </div>
+</div>
+</div>
+</div>
+</section>
+<section class="mb-10">
+<h3 class="text-2xl font-semibold text-gray-800 mb-4">Destaques</h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+<div class="bg-white rounded-xl shadow-lg overflow-hidden">
+<div class="w-full h-48 thumbnail-placeholder">
+<span class="material-icons text-6xl text-gray-400">mic_none</span>
+</div>
+<div class="p-4">
+<h4 class="font-semibold text-gray-800 mb-1">Episode Title</h4>
+<p class="text-sm text-gray-500">16:02</p>
+</div>
+</div>
+<div class="bg-white rounded-xl shadow-lg overflow-hidden">
+<div class="w-full h-48 thumbnail-placeholder">
+<span class="material-icons text-6xl text-gray-400">mic_none</span>
+</div>
+<div class="p-4">
+<h4 class="font-semibold text-gray-800 mb-1">Episode Title</h4>
+<p class="text-sm text-gray-500">50:22</p>
+</div>
+</div>
+<div class="bg-white rounded-xl shadow-lg overflow-hidden">
+<div class="w-full h-48 thumbnail-placeholder">
+<span class="material-icons text-6xl text-gray-400">mic_none</span>
+</div>
+<div class="p-4">
+<h4 class="font-semibold text-gray-800 mb-1">Episode Title</h4>
+<p class="text-sm text-gray-500">20:17</p>
+</div>
+</div>
+</div>
+</section>
+<section class="mb-10">
+<h3 class="text-2xl font-semibold text-gray-800 mb-4">Mais Ouvidos</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="podcast-card flex items-center space-x-4 shadow">
+<button class="play-button focus:outline-none">
+<span class="material-icons text-gray-700">play_arrow</span>
+</button>
+<div>
+<h4 class="font-medium text-gray-700">Episode 8</h4>
+<p class="text-sm text-gray-500">36:10</p>
+</div>
+</div>
+<div class="podcast-card flex items-center space-x-4 shadow">
+<button class="play-button focus:outline-none">
+<span class="material-icons text-gray-700">play_arrow</span>
+</button>
+<div>
+<h4 class="font-medium text-gray-700">Episode 5</h4>
+<p class="text-sm text-gray-500">28:44</p>
+</div>
+</div>
+</div>
+</section>
+<section class="mb-10">
+<h3 class="text-2xl font-semibold text-gray-800 mb-4">Mais Episódios</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="podcast-card flex items-center space-x-4 shadow">
+<button class="play-button focus:outline-none">
+<span class="material-icons text-gray-700">play_arrow</span>
+</button>
+<div>
+<h4 class="font-medium text-gray-700">Episode 9</h4>
+<p class="text-sm text-gray-500">12:32</p>
+</div>
+</div>
+<div class="podcast-card flex items-center space-x-4 shadow">
+<button class="play-button focus:outline-none">
+<span class="material-icons text-gray-700">play_arrow</span>
+</button>
+<div>
+<h4 class="font-medium text-gray-700">Episode 7</h4>
+<p class="text-sm text-gray-500">30:16</p>
+</div>
+</div>
+</div>
+<div class="mt-6 text-center">
+<button class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg shadow focus:outline-none">
+                Ver Todos
+            </button>
+</div>
+</section>
+
+<footer class="mt-12 pt-8 pb-6 border-t border-gray-200">
+    <div class="container mx-auto px-4">
+        <section class="newsletter-signup mb-8 max-w-xl mx-auto bg-gray-50 p-6 rounded-lg shadow">
+            <h3 class="text-2xl font-semibold text-gray-800 mb-3 text-center">Assine nossa Newsletter</h3>
+            <p class="text-gray-600 mb-4 text-center">Receba avisos de novos episódios diretamente no seu e-mail!</p>
+            <form action="#" method="post" class="flex flex-col sm:flex-row gap-3">
+                <label for="newsletter-email-index" class="sr-only">Seu e-mail</label>
+                <input type="email" id="newsletter-email-index" name="newsletter_email" placeholder="Seu melhor e-mail" required class="flex-grow p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-md shadow focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Inscrever</button>
+            </form>
+        </section>
+        <p class="text-center text-gray-500 text-sm">&copy; 2024 Se Liga Podcast. Todos os direitos reservados.</p>
+    </div>
+</footer>
+<audio id="global-audio-player" style="display:none;"></audio>
+<script src="js/main.js" defer></script>
+</body></html>
