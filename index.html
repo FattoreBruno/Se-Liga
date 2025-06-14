@@ -11,9 +11,21 @@
 </head>
 <body class="p-6 md:p-8">
 <header class="flex flex-col md:flex-row justify-between items-center mb-8 p-4 bg-gray-100 shadow-md">
-    <div class="banner mb-4 md:mb-0">
-        <h1 class="text-4xl font-bold text-indigo-600">Se Liga</h1>
-        <p class="text-sm text-gray-600">📰 As notícias do dia em segundos! Fique por dentro antes de sair de casa! 🚀🕒</p>
+    <div class="banner mb-4 md:mb-0 flex flex-col md:flex-row items-center justify-start">
+        <div class="text-center md:text-left"> <!-- Wrapper for title and slogan -->
+            <h1 class="text-4xl font-bold text-indigo-600">Se Liga</h1>
+            <p class="text-sm text-gray-600">📰 As notícias do dia em segundos! Fique por dentro antes de sair de casa! 🚀🕒</p>
+        </div>
+        <div id="header-player-controls-container" class="flex items-center space-x-2 p-2 rounded-lg shadow-sm bg-gray-50 ml-0 md:ml-6 mt-2 md:mt-0">
+            <button id="header-player-play-pause-button" class="focus:outline-none p-1 hover:bg-gray-200 rounded-full">
+                <span id="header-player-play-pause-icon" class="material-icons text-gray-700" style="font-size: 24px;">play_arrow</span>
+            </button>
+            <div class="w-20 h-1 bg-gray-300 rounded-full overflow-hidden cursor-pointer" id="header-player-progress-container">
+                <div id="header-player-progress-fill" class="h-full bg-indigo-500" style="width: 0%;"></div>
+            </div>
+            <span id="header-player-volume-icon" class="material-icons text-gray-700" style="font-size: 22px;">volume_up</span>
+            <!-- <span class="text-xs font-semibold text-gray-600 hidden md:inline">Player</span> -->
+        </div>
     </div>
     <nav>
         <ul class="flex space-x-4">
