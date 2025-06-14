@@ -1,3 +1,4 @@
+try { document.getElementById('debug-stage').textContent = 'STATUS: Main.js - Top Executed'; } catch(e){ console.error('Debug error:', e); }
 const RSS_URL = 'https://anchor.fm/s/105d2ac84/podcast/rss';
 
 // Player and UI Element Variables
@@ -34,10 +35,13 @@ function updateRssStatus(message, isError = false) {
                  statusDisplay.className = 'my-4 p-4 text-center text-lg text-blue-700 border border-blue-300 bg-blue-50 rounded-md';
             }
         }
+    } else {
+        try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - #rss-status-display NOT FOUND. Msg: " + message.substring(0,50); } catch(e){} /* Original console.warn removed */
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - DOMContentLoaded (Player Refs Init)"; } catch(e){}
     console.log('Main.js DOMContentLoaded: Initializing shell components.');
     if (typeof initializePlayerDOMReferences === 'function') {
         initializePlayerDOMReferences();
@@ -45,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.initializeHomePage = function() {
+    try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - initializeHomePage called"; } catch(e){}
     console.log('initializeHomePage called from router.');
     if (typeof initializePlayerDOMReferences === 'function') {
         initializePlayerDOMReferences();
@@ -117,6 +122,7 @@ function initializePlayerDOMReferences() {
 }
 
 async function fetchRSSFeed() {
+    try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - fetchRSSFeed started"; } catch(e){}
     console.log('Fetching RSS feed...');
     updateRssStatus("Loading episodes...");
     try {
@@ -253,4 +259,4 @@ function populateDestaques(episodes) { populateSection("Destaques", episodes, cr
 
 FINAL_JS_EOF
 
-echo "js/main.js updated: populateHTML function adjusted for new episode counts (Destaques: 3, Mais Ouvidos: 3, Mais Episodios: 4)."
+echo "js/main.js updated with on-page RSS status display logic and related function calls."
