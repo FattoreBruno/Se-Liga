@@ -42,3 +42,35 @@ body {
     align-items: center;
     justify-content: center;
 }
+
+/* --- Audio Player Styles --- */
+#audio-player-controls button .material-icons {
+    font-size: 28px; /* Consistent icon size */
+    vertical-align: middle;
+}
+
+#play-pause-btn .material-icons {
+    font-size: 32px; /* Larger play/pause icon */
+}
+
+#progress-bar-container {
+    /* Ensure it has a min-width or takes up available space well */
+    min-width: 100px;
+    /* Adding a bit of vertical centering if text alongside is different size */
+    display: flex;
+    align-items: center;
+}
+
+#progress-bar-fill {
+    transition: width 0.1s linear; /* Smooth progress update */
+}
+
+/* Add some hover states for better interactivity if not covered by Tailwind */
+#audio-player-controls button:hover:not(#play-pause-btn) {
+    background-color: #e0e0e0; /* Light gray for non-primary buttons */
+}
+
+#progress-bar-container:hover {
+    /* Maybe a slightly different background or border on hover to indicate clickability */
+    background-color: #c7c7c7;
+}
