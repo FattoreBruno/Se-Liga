@@ -1,3 +1,4 @@
+try { document.getElementById('debug-stage').textContent = 'STATUS: Router.js - Top Executed'; } catch(e){ console.error('Debug error:', e); }
 const GITHUB_PAGES_BASE_PATH = '/Se-Liga';
 
 const routes = {
@@ -10,6 +11,7 @@ const routes = {
 const appContent = document.getElementById('app-content');
 
 async function loadContent(path) {
+    try { document.getElementById("debug-stage").textContent = "STATUS: Router.js - loadContent start for: " + path; } catch(e){}
     if (!appContent) {
         console.error('#app-content element not found.');
         return;
@@ -26,10 +28,12 @@ async function loadContent(path) {
         }
         const html = await response.text();
         appContent.innerHTML = html;
+        try { document.getElementById("debug-stage").textContent = "STATUS: Router.js - Content injected for: " + targetPath; } catch(e){}
         console.log(`Router: Content for "${targetPath}" loaded successfully.`);
 
         if (targetPath === '/') {
-            if (window.initializeHomePage) {
+            try { document.getElementById("debug-stage").textContent = "STATUS: Router.js - Calling initializeHomePage for: " + targetPath; } catch(e){}
+    if (window.initializeHomePage) {
                 console.log('Router: Initializing home page specific JavaScript...');
                 window.initializeHomePage();
             } else {
@@ -39,6 +43,7 @@ async function loadContent(path) {
         // Add similar checks for other pages if they need specific JS initialization
     } catch (error) {
         console.error('Router: Error loading content for path', path, error);
+        try { document.getElementById("debug-stage").textContent = "STATUS: Router.js - Error in loadContent: " + error.message.substring(0, 100); } catch(e){}
         appContent.innerHTML = `
             <div class="text-center p-8">
                 <h1 class="text-4xl font-bold text-red-600 mb-4">Page Not Found</h1>
@@ -83,6 +88,7 @@ function navigateTo(path) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    try { document.getElementById("debug-stage").textContent = "STATUS: Router.js - DOMContentLoaded"; } catch(e){}
     if (!appContent) {
         console.error("#app-content not found on DOMContentLoaded. Router cannot initialize.");
         return;

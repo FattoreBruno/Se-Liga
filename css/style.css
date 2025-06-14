@@ -115,3 +115,20 @@ body {
 #mini-player-progress-fill {
     transition: width 0.1s linear; /* Smooth progress update if not already set by Tailwind */
 }
+
+/* --- Enhanced Mini Player Styles --- */
+#mini-player-thumbnail {
+    object-fit: cover; /* Ensures the image covers the area without distortion */
+    /* width and height are set by Tailwind (w-12 h-12) */
+    /* border-radius is set by Tailwind (rounded-md) */
+}
+
+/* Ensure controls within the flex container in the mini player are vertically centered */
+#mini-player .flex .material-icons {
+    vertical-align: middle; /* Reinforce vertical alignment */
+}
+
+#mini-player-time-info {
+    /* Ensure it does not shrink too much if space is tight */
+    flex-shrink: 0;
+}

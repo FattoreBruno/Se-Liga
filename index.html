@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="p-6 md:p-8">
+<div id="debug-stage" style="position: fixed; top: 5px; left: 5px; background-color: yellow; color: black; padding: 8px; font-size: 12px; z-index: 9999; border: 1px solid black;">Site Loading...</div>
 <header class="flex flex-col md:flex-row justify-between items-center mb-8 p-4 bg-gray-100 shadow-md">
     <div class="banner mb-4 md:mb-0 flex flex-col md:flex-row items-center justify-start">
         <div class="text-center md:text-left"> <!-- Wrapper for title and slogan -->
@@ -51,23 +52,28 @@
         <p class="text-center text-gray-500 text-sm">&copy; 2024 Se Liga Podcast. Todos os direitos reservados.</p>
     </div>
 </footer>
-<div id="mini-player" class="fixed top-4 right-4 bg-gray-800 text-white shadow-xl rounded-lg p-3 w-72 z-50 hidden transition-opacity duration-300 ease-in-out opacity-0">
-    <button id="mini-player-close-btn" class="absolute top-1 right-1 text-gray-400 hover:text-white focus:outline-none">
-        <span class="material-icons" style="font-size: 16px;">close</span>
+<div id="mini-player" class="fixed top-4 right-4 bg-gray-800 text-white shadow-xl rounded-lg p-3 w-80 z-50 hidden transition-opacity duration-300 ease-in-out opacity-0">
+    <button id="mini-player-close-btn" class="absolute top-2 right-2 text-gray-400 hover:text-white focus:outline-none z-10">
+        <span class="material-icons" style="font-size: 18px;">close</span>
     </button>
-    <p id="mini-player-title" class="text-sm font-medium truncate mb-2" title="No track playing">No track playing</p>
-    <div class="flex items-center space-x-2">
-        <button id="mini-player-rewind-btn" class="p-1 focus:outline-none hover:bg-gray-700 rounded-full">
-            <span class="material-icons" style="font-size: 20px;">replay_5</span>
-        </button>
-        <button id="mini-player-play-pause-btn" class="p-1 focus:outline-none hover:bg-gray-700 rounded-full">
-            <span id="mini-player-play-pause-icon" class="material-icons" style="font-size: 28px;">play_arrow</span>
-        </button>
-        <button id="mini-player-forward-btn" class="p-1 focus:outline-none hover:bg-gray-700 rounded-full">
-            <span class="material-icons" style="font-size: 20px;">forward_5</span>
-        </button>
-        <div id="mini-player-time-info" class="text-xs ml-auto">
-            <span id="mini-player-current-time">00:00</span> / <span id="mini-player-total-duration">00:00</span>
+    <div class="flex items-center">
+        <img id="mini-player-thumbnail" src="images/default-podcast-thumb.png" alt="Episode thumbnail" class="w-12 h-12 rounded-md mr-3 object-cover">
+        <div class="flex-grow overflow-hidden">
+            <p id="mini-player-title" class="text-sm font-semibold truncate" title="No track playing">No track playing</p>
+            <div class="flex items-center space-x-1 mt-1">
+                <button id="mini-player-rewind-btn" class="p-1 focus:outline-none hover:bg-gray-700 rounded-full">
+                    <span class="material-icons text-gray-300 hover:text-white" style="font-size: 22px;">replay_5</span>
+                </button>
+                <button id="mini-player-play-pause-btn" class="p-1 focus:outline-none hover:bg-gray-700 rounded-full">
+                    <span id="mini-player-play-pause-icon" class="material-icons text-gray-100 hover:text-white" style="font-size: 30px;">play_arrow</span>
+                </button>
+                <button id="mini-player-forward-btn" class="p-1 focus:outline-none hover:bg-gray-700 rounded-full">
+                    <span class="material-icons text-gray-300 hover:text-white" style="font-size: 22px;">forward_5</span>
+                </button>
+                <div id="mini-player-time-info" class="text-xs text-gray-400 ml-auto whitespace-nowrap">
+                    <span id="mini-player-current-time">00:00</span> / <span id="mini-player-total-duration">00:00</span>
+                </div>
+            </div>
         </div>
     </div>
     <div id="mini-player-progress-bar-container" class="w-full h-1.5 bg-gray-600 rounded-full mt-2 cursor-pointer">
