@@ -129,61 +129,104 @@ function initializePlayerDOMReferences() {
 }
 
 async function fetchRSSFeed() {
-    try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - fetchRSSFeed: START"; } catch(e){console.error("Debug fail:",e)}
+    try { 
+        document.getElementById("debug-stage").textContent = "STATUS: Main.js - fetchRSSFeed: START"; 
+    } catch(e) {
+        console.error("Debug fail:", e);
+    }
+    
     console.log('Fetching RSS feed...');
-    try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - fetchRSSFeed: Before updateRssStatus(Loading)"; } catch(e){console.error("Debug fail:",e)}
-    updateRssStatus("Loading episodes...");
-    try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - fetchRSSFeed: After updateRssStatus(Loading)"; } catch(e){console.error("Debug fail:",e)}
+    updateRssStatus("Carregando episódios...");
+    
     try {
-        try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - fetchRSSFeed: Before await fetch"; } catch(e){console.error("Debug fail:",e)}
-    const response = await fetch(RSS_URL);
-        try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - fetchRSSFeed: After await fetch, Response OK: " + response.ok; } catch(e){console.error("Debug fail:",e)}
+        const response = await fetch(RSS_URL, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/xml',
+                'Cache-Control': 'no-cache'
+            }
+        });
+        
         if (!response.ok) {
-            throw new Error(\`HTTP error! status: \${response.status} (\${response.statusText})\`);
+            throw new Error(`Erro HTTP! status: ${response.status} (${response.statusText})`);
         }
+        
         const xmlText = await response.text();
+        if (!xmlText || xmlText.trim() === '') {
+            throw new Error('Feed RSS retornou vazio');
+        }
+        
         parseRSSFeed(xmlText);
     } catch (error) {
-        try { document.getElementById("debug-stage").textContent = "STATUS: Main.js - fetchRSSFeed: CATCH block - Error: " + String(error.message).substring(0,100); } catch(e){console.error("Debug fail:",e)}
-        console.error('Error fetching RSS feed:', error);
-        updateRssStatus(\`Failed to load podcast feed. \${error.message}\`, true);
+        console.error('Erro ao buscar feed RSS:', error);
+        updateRssStatus(`Falha ao carregar o feed do podcast. ${error.message}`, true);
     }
 }
 
 function parseRSSFeed(xmlText) {
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
-    const parsingError = xmlDoc.getElementsByTagName('parsererror');
-    if (parsingError.length > 0) {
-        console.error('Error parsing XML:', parsingError[0].textContent);
-        updateRssStatus(\`Error processing podcast data: \${parsingError[0].textContent}\`, true);
-        return;
+    try {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+        
+        // Verificar se há erros de parsing
+        const parsingError = xmlDoc.getElementsByTagName('parsererror');
+        if (parsingError.length > 0) {
+            throw new Error(`Erro ao processar XML: ${parsingError[0].textContent}`);
+        }
+        
+        // Verificar se o feed tem itens
+        const items = xmlDoc.querySelectorAll('item');
+        if (!items || items.length === 0) {
+            throw new Error('Nenhum episódio encontrado no feed.');
+        }
+        
+        // Processar os itens do feed
+        const episodes = Array.from(items).map(item => {
+            try {
+                const title = item.querySelector('title')?.textContent || 'Sem título';
+                const link = item.querySelector('link')?.textContent || '#';
+                const description = item.querySelector('description')?.textContent || 'Sem descrição';
+                const pubDate = item.querySelector('pubDate')?.textContent || '';
+                const enclosure = item.querySelector('enclosure');
+                const audioUrl = enclosure?.getAttribute('url') || '#';
+                
+                let duration = '0';
+                const itunesDurationNode = Array.from(item.childNodes)
+                    .find(node => node.nodeName === 'itunes:duration' || node.localName === 'duration');
+                if (itunesDurationNode) duration = itunesDurationNode.textContent;
+                
+                let imageUrl = null;
+                const itunesImage = item.querySelector('itunes\\:image[href]');
+                if (itunesImage) {
+                    imageUrl = itunesImage.getAttribute('href');
+                } else {
+                    const mediaThumbnail = item.querySelector('media\\:thumbnail[url]');
+                    if (mediaThumbnail) {
+                        imageUrl = mediaThumbnail.getAttribute('url');
+                    } else {
+                        const imageInDescription = item.querySelector('description img');
+                        if (imageInDescription) {
+                            imageUrl = imageInDescription.src;
+                        }
+                    }
+                }
+                
+                return { title, link, description, pubDate, audioUrl, duration, imageUrl };
+            } catch (itemError) {
+                console.error('Erro ao processar item do feed:', itemError);
+                return null;
+            }
+        }).filter(episode => episode !== null);
+        
+        if (episodes.length === 0) {
+            throw new Error('Nenhum episódio válido encontrado no feed.');
+        }
+        
+        populateHTML(episodes);
+    } catch (error) {
+        console.error('Erro ao processar feed RSS:', error);
+        updateRssStatus(`Erro ao processar dados do podcast: ${error.message}`, true);
     }
-    let channelImage = null;
-    const channelImageNode = xmlDoc.querySelector('channel > image > url, channel > itunes\\:image[href]');
-    if (channelImageNode) {
-        channelImage = channelImageNode.textContent || channelImageNode.getAttribute('href');
-    }
-    const items = xmlDoc.querySelectorAll('item');
-    if (!items || items.length === 0) {
-        updateRssStatus("No episodes found in the feed.", false);
-        return;
-    }
-    const episodes = Array.from(items).map(item => {
-        const title = item.querySelector('title')?.textContent || 'No title';
-        const link = item.querySelector('link')?.textContent || '#';
-        const description = item.querySelector('description')?.textContent || 'No description';
-        const pubDate = item.querySelector('pubDate')?.textContent || '';
-        const enclosure = item.querySelector('enclosure');
-        const audioUrl = enclosure?.getAttribute('url') || '#';
-        let duration = '0';
-        const itunesDurationNode = Array.from(item.childNodes).find(node => node.nodeName === 'itunes:duration' || node.localName === 'duration');
-        if (itunesDurationNode) duration = itunesDurationNode.textContent;
-        let imageUrl = null;
-        const itunesImage = item.querySelector('itunes\\:image[href]'); if (itunesImage) imageUrl = itunesImage.getAttribute('href'); else { const mediaThumbnail = item.querySelector('media\\:thumbnail[url]'); if (mediaThumbnail) imageUrl = mediaThumbnail.getAttribute('url'); else { const imageInDescription = item.querySelector('description img'); if(imageInDescription) imageUrl = imageInDescription.src; }} if (!imageUrl && channelImage) imageUrl = channelImage;
-        return { title, link, description, pubDate, audioUrl, duration, imageUrl };
-    });
-    populateHTML(episodes);
 }
 
 function populateHTML(episodes) {

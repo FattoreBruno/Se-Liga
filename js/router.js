@@ -11,45 +11,55 @@ const routes = {
 const appContent = document.getElementById('app-content');
 
 async function loadContent(path) {
-    try { document.getElementById("debug-stage").textContent = "STATUS: Router.js - loadContent start for: " + path; } catch(e){}
+    const appContent = document.getElementById('app-content');
     if (!appContent) {
-        console.error('#app-content element not found.');
+        console.error('Router: Elemento app-content não encontrado');
         return;
     }
 
-    const targetPath = routes[path] ? path : '/'; // Fallback to '/' for unknown paths
-    const filePath = routes[targetPath];
-    console.log(`Router: Loading content for SPA path: "${targetPath}", from file: "${filePath}"`);
+    let targetPath = path;
+    if (targetPath === '/') {
+        targetPath = '/home';
+    }
+
+    const filePath = `${GITHUB_PAGES_BASE_PATH}/pages${targetPath}_content.html`;
+    console.log(`Router: Carregando conteúdo de: ${filePath}`);
 
     try {
-        const response = await fetch(filePath); // filePath should be relative to index.html
+        const response = await fetch(filePath);
         if (!response.ok) {
-            throw new Error(`Failed to fetch content: ${response.status} ${response.statusText} for ${filePath}`);
+            throw new Error(`Falha ao carregar conteúdo: ${response.status} ${response.statusText} para ${filePath}`);
         }
+        
         const html = await response.text();
+        if (!html || html.trim() === '') {
+            throw new Error('Conteúdo retornado está vazio');
+        }
+        
         appContent.innerHTML = html;
-        try { document.getElementById("debug-stage").textContent = "STATUS: Router.js - Content injected for: " + targetPath; } catch(e){}
-        console.log(`Router: Content for "${targetPath}" loaded successfully.`);
+        console.log(`Router: Conteúdo para "${targetPath}" carregado com sucesso.`);
 
-        if (targetPath === '/') {
-            try { document.getElementById("debug-stage").textContent = "STATUS: Router.js - Calling initializeHomePage for: " + targetPath; } catch(e){}
-    if (window.initializeHomePage) {
-                console.log('Router: Initializing home page specific JavaScript...');
-                window.initializeHomePage();
+        if (targetPath === '/home') {
+            console.log('Router: Inicializando JavaScript específico da página inicial...');
+            if (typeof window.initializeHomePage === 'function') {
+                try {
+                    window.initializeHomePage();
+                    console.log('Router: initializeHomePage executado com sucesso');
+                } catch (initError) {
+                    console.error('Router: Erro ao executar initializeHomePage:', initError);
+                }
             } else {
-                console.warn('Router: initializeHomePage function not found on window.');
+                console.warn('Router: Função initializeHomePage não encontrada');
             }
         }
-        // Add similar checks for other pages if they need specific JS initialization
     } catch (error) {
-        console.error('Router: Error loading content for path', path, error);
-        try { document.getElementById("debug-stage").textContent = "STATUS: Router.js - Error in loadContent: " + error.message.substring(0, 100); } catch(e){}
+        console.error('Router: Erro ao carregar conteúdo para o caminho', path, error);
         appContent.innerHTML = `
             <div class="text-center p-8">
-                <h1 class="text-4xl font-bold text-red-600 mb-4">Page Not Found</h1>
-                <p class="text-xl text-gray-700">Sorry, the page you were looking for could not be loaded.</p>
-                <p class="text-md text-gray-500 mt-2">Attempted path: ${path}</p>
-                <a href="${GITHUB_PAGES_BASE_PATH}/" class="mt-6 inline-block bg-indigo-600 text-white font-semibold py-2 px-4 rounded hover:bg-indigo-700 router-link">Go to Homepage</a>
+                <h1 class="text-4xl font-bold text-red-600 mb-4">Página Não Encontrada</h1>
+                <p class="text-xl text-gray-700">Desculpe, a página que você está procurando não pôde ser carregada.</p>
+                <p class="text-md text-gray-500 mt-2">Caminho tentado: ${path}</p>
+                <a href="${GITHUB_PAGES_BASE_PATH}/" class="mt-6 inline-block bg-indigo-600 text-white font-semibold py-2 px-4 rounded hover:bg-indigo-700 router-link">Ir para a Página Inicial</a>
             </div>
         `;
     }
